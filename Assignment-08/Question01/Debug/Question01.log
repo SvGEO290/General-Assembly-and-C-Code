@@ -1,0 +1,4 @@
+﻿  Assembling example.asm...
+example.asm(56): error A2206: missing operator in expression
+example.asm(59): error A2206: missing operator in expression
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Microsoft\VC\v160\BuildCustomizations\masm.targets(70,5): error MSB3721: The command "ml.exe /c /nologo /Zi /Fo"Debug\example.obj" /W3 /errorReport:prompt /Fl /Taexample.asm" exited with code 1.

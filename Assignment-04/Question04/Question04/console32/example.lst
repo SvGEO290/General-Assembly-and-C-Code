@@ -1,0 +1,74 @@
+Microsoft (R) Macro Assembler Version 14.29.30145.0	    02/17/23 18:51:34
+example.asm						     Page 1 - 1
+
+
+				; Explain what this program does
+				; Author:  Your name
+				; Date:    put the date
+
+				.586
+				.MODEL FLAT
+
+				.STACK  4096            ; reserve 4096-byte stack
+
+ 00000000			.DATA                   ; reserve storage for data
+ 00000000 00000023		x	DWORD 35
+ 00000004 0000002F		y	DWORD 47
+ 00000008 0000001A		z	DWORD 26
+
+ 00000000			.CODE					; start of main code
+ 00000000			main	PROC
+ 00000000  A1 00000000 R			mov		eax, x		
+ 00000005  03 05 00000004 R			add		eax, y		 
+ 0000000B  8B 1D 00000008 R			mov		ebx, z	
+ 00000011  03 DB				add		ebx, ebx
+ 00000013  2B C3				sub		eax, ebx
+ 00000015  40					inc		eax
+ 00000016  F7 D8				neg		eax
+ 00000018  B8 00000000				mov		eax, 0
+ 0000001D  C3					ret
+
+ 0000001E			main ENDP
+				END
+Microsoft (R) Macro Assembler Version 14.29.30145.0	    02/17/23 18:51:34
+example.asm						     Symbols 2 - 1
+
+
+
+
+Segments and Groups:
+
+                N a m e                 Size     Length   Align   Combine Class
+
+FLAT . . . . . . . . . . . . . .	GROUP
+STACK  . . . . . . . . . . . . .	32 Bit	 00001000 Para	  Stack	  'STACK'	 
+_DATA  . . . . . . . . . . . . .	32 Bit	 0000000C Para	  Public  'DATA'	
+_TEXT  . . . . . . . . . . . . .	32 Bit	 0000001E Para	  Public  'CODE'	
+
+
+Procedures, parameters, and locals:
+
+                N a m e                 Type     Value    Attr
+
+main . . . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 0000001E Public
+
+
+Symbols:
+
+                N a m e                 Type     Value    Attr
+
+@CodeSize  . . . . . . . . . . .	Number	 00000000h   
+@DataSize  . . . . . . . . . . .	Number	 00000000h   
+@Interface . . . . . . . . . . .	Number	 00000000h   
+@Model . . . . . . . . . . . . .	Number	 00000007h   
+@code  . . . . . . . . . . . . .	Text   	 _TEXT
+@data  . . . . . . . . . . . . .	Text   	 FLAT
+@fardata?  . . . . . . . . . . .	Text   	 FLAT
+@fardata . . . . . . . . . . . .	Text   	 FLAT
+@stack . . . . . . . . . . . . .	Text   	 FLAT
+x  . . . . . . . . . . . . . . .	DWord	 00000000 _DATA	
+y  . . . . . . . . . . . . . . .	DWord	 00000004 _DATA	
+z  . . . . . . . . . . . . . . .	DWord	 00000008 _DATA	
+
+	   0 Warnings
+	   0 Errors

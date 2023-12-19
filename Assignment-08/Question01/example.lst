@@ -1,0 +1,139 @@
+Microsoft (R) Macro Assembler Version 14.29.30148.0	    03/26/23 22:10:13
+example.asm						     Page 1 - 1
+
+
+				; Assignment-08
+				; Author:  Samuel George
+				; Date:    3/25/2023
+
+				.586
+				.MODEL FLAT
+
+
+				.STACK 4096
+
+ 00000000			.DATA
+
+ 00000000 FF0AFF01		array1  DWORD 0ff0aff01h, 0ff0bff02h, 0ff0cff03h, 0ff0dff04h, 0ff0eff05h        ;first array
+	   FF0BFF02
+	   FF0CFF03
+	   FF0DFF04
+	   FF0EFF05
+ 00000014 02FF0AFF		array2  DWORD 002ff0affh, 003ff0bffh, 004ff0cffh, 005ff0dffh, 006ff0effh        ;second array
+	   03FF0BFF
+	   04FF0CFF
+	   05FF0DFF
+	   06FF0EFF
+ 00000028  00000005 [		array3  DWORD 5 dup(?)  ;created 3rd array                                      ;third array made for filling in with contents of first two
+	    00000000
+	   ]
+
+
+ 00000000			.CODE
+ 00000000			_MainProc PROC
+				        
+ 00000000  33 C0		        xor     eax, eax
+ 00000002  B9 00000005		        mov     ecx, 5
+
+ 00000007  8D 05 00000000 R	        lea     eax, array1             ;loading array 1 content into eax
+ 0000000D  8D 1D 00000014 R	        lea     ebx, array2             ;loading array 2 content into ebx
+ 00000013  8D 0D 00000028 R	        lea     ecx, array3             ;loading array 3 into ecx
+ 00000019  BA 00000005		        mov     edx, 5
+ 0000001E  E8 00000006		        call    arrMix
+ 00000023  B8 00000000		        mov     eax, 0  ; exit with return code 0
+				        
+ 00000028  C3			        ret
+ 00000029			_MainProc ENDP
+
+ 00000029			arrMix PROC
+				        ;start of code for arrMix procedure
+
+				        ;stack frame starts with pushing ebp, then ebx, then esi, and lastly edi
+ 00000029  55			        push    ebp                     ; start by pushing ebp
+ 0000002A  8B EC		        mov     ebp, esp                ;     
+ 0000002C  53			        push    ebx                     ; push ebx
+ 0000002D  56			        push    esi                     ; push esi
+ 0000002E  57			        push    edi                     ; push edi
+
+ 0000002F  8B 4D 0C		        mov     ecx, [ebp + 0Ch]        ;count
+ 00000032  8B 75 08		        mov     esi, [ebp + 8]          ;address of array1
+ 00000035  8B 7D 10		        mov     edi, [ebp + 10h]        ;address of array2
+ 00000038  8B 5D 14		        mov     ebx, [ebp + 14h]        ;address of array3
+
+ 0000003B  33 C0		        xor     eax, eax                ;eax is now cleared up
+
+				        ;loop for the arrays
+
+ 0000003D			arrloop:
+
+ 0000003D  8B 06		        mov     eax, [esi]
+				        and     eax, 0x00ff00ff         
+example.asm(56) : error A2206:missing operator in expression
+ 0000003F  C1 E0 08		        shl     eax, 8
+ 00000042  8B 17		        mov     edx, [edi]
+				        and     edx, 0xFF00FF00
+example.asm(59) : error A2206:missing operator in expression
+ 00000044  C1 EA 08		        shr     edx, 8
+ 00000047  0B C2		        or      eax, edx
+ 00000049  89 03		        mov     [ebx], eax
+ 0000004B  83 C6 04		        add     esi, 4
+ 0000004E  83 C7 04		        add     edi, 4
+ 00000051  83 C3 04		        add     ebx, 4
+				        
+ 00000054  E2 E7		        loop    arrloop                 ; repeats for all arrays elements
+
+ 00000056  5F			        pop     edi
+ 00000057  5E			        pop     esi
+ 00000058  5B			        pop     ebx
+ 00000059  8B E5		        mov     esp, ebp                ; moving the contents back from how it was originally moved.
+ 0000005B  5D			        pop     ebp
+				        ;stack frame ends with popping edi, esi, ebx, and then lastly ebp... the opposite of how the stackframe started
+
+ 0000005C  C3			        ret
+ 0000005D			arrMix ENDP
+
+				END                             ; end of source code
+Microsoft (R) Macro Assembler Version 14.29.30148.0	    03/26/23 22:10:13
+example.asm						     Symbols 2 - 1
+
+
+
+
+Segments and Groups:
+
+                N a m e                 Size     Length   Align   Combine Class
+
+FLAT . . . . . . . . . . . . . .	GROUP
+STACK  . . . . . . . . . . . . .	32 Bit	 00001000 Para	  Stack	  'STACK'	 
+_DATA  . . . . . . . . . . . . .	32 Bit	 0000003C Para	  Public  'DATA'	
+_TEXT  . . . . . . . . . . . . .	32 Bit	 0000007B Para	  Public  'CODE'	
+
+
+Procedures, parameters, and locals:
+
+                N a m e                 Type     Value    Attr
+
+_MainProc  . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 00000029 Public
+arrMix . . . . . . . . . . . . .	P Near	 00000029 _TEXT	Length= 00000052 Public
+  arrloop  . . . . . . . . . . .	L Near	 0000003D _TEXT	
+
+
+Symbols:
+
+                N a m e                 Type     Value    Attr
+
+@CodeSize  . . . . . . . . . . .	Number	 00000000h   
+@DataSize  . . . . . . . . . . .	Number	 00000000h   
+@Interface . . . . . . . . . . .	Number	 00000000h   
+@Model . . . . . . . . . . . . .	Number	 00000007h   
+@code  . . . . . . . . . . . . .	Text   	 _TEXT
+@data  . . . . . . . . . . . . .	Text   	 FLAT
+@fardata?  . . . . . . . . . . .	Text   	 FLAT
+@fardata . . . . . . . . . . . .	Text   	 FLAT
+@stack . . . . . . . . . . . . .	Text   	 FLAT
+array1 . . . . . . . . . . . . .	DWord	 00000000 _DATA	
+array2 . . . . . . . . . . . . .	DWord	 00000014 _DATA	
+array3 . . . . . . . . . . . . .	DWord	 00000028 _DATA	
+
+	   0 Warnings
+	   2 Errors

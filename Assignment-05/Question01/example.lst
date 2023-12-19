@@ -1,0 +1,227 @@
+Microsoft (R) Macro Assembler Version 14.29.30148.0	    02/24/23 22:05:08
+example.asm						     Page 1 - 1
+
+
+				; Assignment 5 Question 1
+				; Author:  Samuel George
+				; Date:    2/24/2023
+
+				.586
+				.MODEL FLAT
+
+				INCLUDE io.h            ; header file for input/output
+			      C ; IO.H -- header file for I/O macros (listing suppressed)
+			      C .NOLIST      ; turn off listing
+			      C .LIST        ; begin listing
+			      C 
+
+				.STACK 4096
+
+ 00000000			.DATA
+
+				;constant number variables
+
+ 00000000 0000000A		number10 DWORD  10
+ 00000004 00000003		number3 DWORD   3
+ 00000008 00000007		number7 DWORD   7
+ 0000000C 00000005		number5 DWORD   5
+
+
+
+
+				;input variables
+
+ 00000010 45 6E 74 65 72	prompt1 BYTE    "Enter a number", 0                         ;input prompt for value x
+	   20 61 20 6E 75
+	   6D 62 65 72 00
+ 0000001F 00000000		numberX DWORD   ?                                           ;variable for input for value x
+ 00000023  00000028 [		string  BYTE    40 DUP (?)
+	    00
+	   ]
+
+
+
+
+				;output variables
+
+ 0000004B 54 68 65 20 72	resultLbl BYTE  "The results for the obvious method and horners scheme respectively"    ; label to show 
+	   65 73 75 6C 74
+	   73 20 66 6F 72
+	   20 74 68 65 20
+	   6F 62 76 69 6F
+	   75 73 20 6D 65
+	   74 68 6F 64 20
+	   61 6E 64 20 68
+	   6F 72 6E 65 72
+	   73 20 73 63 68
+	   65 6D 65 20 72
+	   65 73 70 65 63
+	   74 69 76 65 6C
+	   79
+
+ 0000008D 54 68 65 20 76	ObviMethod  BYTE    "The value using the obvious method is: "    
+	   61 6C 75 65 20
+	   75 73 69 6E 67
+	   20 74 68 65 20
+	   6F 62 76 69 6F
+	   75 73 20 6D 65
+	   74 68 6F 64 20
+	   69 73 3A 20
+ 000000B4  0000000B [		answer     BYTE    11 DUP (?), 0ah, 0dh
+	    00
+	   ] 0A 0D
+
+ 000000C1 54 68 65 20 76	xxx   BYTE    "The value using horners scheme is: "
+	   61 6C 75 65 20
+	   75 73 69 6E 67
+	   20 68 6F 72 6E
+	   65 72 73 20 73
+	   63 68 65 6D 65
+	   20 69 73 3A 20
+ 000000E4  0000000B [		answer2    BYTE    11 DUP (?), 0
+	    00
+	   ] 00
+
+
+ 00000000			.CODE
+ 00000000			_MainProc PROC
+				        input   prompt1, string, 40      ; read ASCII characters
+				        atod    string          ; convert to integer
+ 0000002D  A3 0000001F R	        mov     numberX, eax    ; store in memory
+
+ 00000032  A1 0000001F R	        mov     eax, numberX    ; first number to EAX
+ 00000037  F7 25 0000001F R	        mul     numberx         ; x * x
+ 0000003D  F7 25 0000001F R	        mul     numberX         ; x * x * x
+ 00000043  F7 25 0000000C R	        mul     number5         ; 5 * x * x * x
+
+
+				        ;to represent 7*x*x
+				    
+ 00000049  8B 1D 00000008 R	        mov     ebx, number7
+
+ 0000004F  0F AF 1D		        imul    ebx, numberX
+	   0000001F R
+ 00000056  0F AF 1D		        imul    ebx, numberX
+	   0000001F R
+
+ 0000005D  F7 DB		        neg     ebx
+
+				        ;to represent 3*x
+
+ 0000005F  8B 0D 00000004 R	        mov     ecx, number3
+ 00000065  0F AF 0D		        imul    ecx, numberX
+	   0000001F R
+
+				        ;time to calculate
+
+ 0000006C  03 D9		        add     ebx, ecx        
+ 0000006E  03 C3		        add     eax, ebx
+ 00000070  F7 D8		        neg     eax                         ;turning eax into a negative value to add it to a postive value of 10 since its technically -10
+ 00000072  03 05 00000000 R	        add     eax, number10               ;adding 10 to - value of eax
+ 00000078  F7 D8		        neg     eax                         ;setting eax back to positive to get final answer
+				        
+
+
+				        ;horners scheme method
+
+				        ;calculation for (5x-7)
+ 0000007A  8B 15 0000000C R	        mov     edx, number5
+ 00000080  0F AF 15		        imul    edx, numberX
+	   0000001F R
+ 00000087  2B 15 00000008 R	        sub     edx, number7
+
+				        ;calculation for ((5x-7) * x+3)
+ 0000008D  0F AF 15		        imul    edx, numberX
+	   0000001F R
+ 00000094  03 15 00000004 R	        add     edx, number3
+
+ 0000009A  0F AF 15		        imul    edx, numberX
+	   0000001F R
+ 000000A1  2B 15 00000000 R	        sub     edx, number10
+
+
+				        
+				        dtoa    answer, eax                 ; convert to ASCII characters
+				        dtoa    answer2, edx             ; convert to ASCII characters
+
+
+				        output  resultLbl, obviMethod           ; output label and sum
+
+				       
+
+ 000000F0  B8 00000000		        mov     eax, 0  ; exit with return code 0
+
+
+ 000000F5  C3			        ret
+ 000000F6			_MainProc ENDP
+				END                             ; end of source code
+
+Microsoft (R) Macro Assembler Version 14.29.30148.0	    02/24/23 22:05:08
+example.asm						     Symbols 2 - 1
+
+
+
+
+Macros:
+
+                N a m e                 Type
+
+atod . . . . . . . . . . . . . .	Proc
+atow . . . . . . . . . . . . . .	Proc
+dtoa . . . . . . . . . . . . . .	Proc
+input  . . . . . . . . . . . . .	Proc
+output . . . . . . . . . . . . .	Proc
+wtoa . . . . . . . . . . . . . .	Proc
+
+
+Segments and Groups:
+
+                N a m e                 Size     Length   Align   Combine Class
+
+FLAT . . . . . . . . . . . . . .	GROUP
+STACK  . . . . . . . . . . . . .	32 Bit	 00001000 Para	  Stack	  'STACK'	 
+_DATA  . . . . . . . . . . . . .	32 Bit	 000000F0 Para	  Public  'DATA'	
+_TEXT  . . . . . . . . . . . . .	32 Bit	 000000F6 Para	  Public  'CODE'	
+
+
+Procedures, parameters, and locals:
+
+                N a m e                 Type     Value    Attr
+
+_MainProc  . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 000000F6 Public
+
+
+Symbols:
+
+                N a m e                 Type     Value    Attr
+
+@CodeSize  . . . . . . . . . . .	Number	 00000000h   
+@DataSize  . . . . . . . . . . .	Number	 00000000h   
+@Interface . . . . . . . . . . .	Number	 00000000h   
+@Model . . . . . . . . . . . . .	Number	 00000007h   
+@code  . . . . . . . . . . . . .	Text   	 _TEXT
+@data  . . . . . . . . . . . . .	Text   	 FLAT
+@fardata?  . . . . . . . . . . .	Text   	 FLAT
+@fardata . . . . . . . . . . . .	Text   	 FLAT
+@stack . . . . . . . . . . . . .	Text   	 FLAT
+ObviMethod . . . . . . . . . . .	Byte	 0000008D _DATA	
+_getInput  . . . . . . . . . . .	L Near	 00000000 FLAT	External
+_showOutput  . . . . . . . . . .	L Near	 00000000 FLAT	External
+answer2  . . . . . . . . . . . .	Byte	 000000E4 _DATA	
+answer . . . . . . . . . . . . .	Byte	 000000B4 _DATA	
+atodproc . . . . . . . . . . . .	L Near	 00000000 FLAT	External
+atowproc . . . . . . . . . . . .	L Near	 00000000 FLAT	External
+dtoaproc . . . . . . . . . . . .	L Near	 00000000 FLAT	External
+number10 . . . . . . . . . . . .	DWord	 00000000 _DATA	
+number3  . . . . . . . . . . . .	DWord	 00000004 _DATA	
+number5  . . . . . . . . . . . .	DWord	 0000000C _DATA	
+number7  . . . . . . . . . . . .	DWord	 00000008 _DATA	
+numberX  . . . . . . . . . . . .	DWord	 0000001F _DATA	
+prompt1  . . . . . . . . . . . .	Byte	 00000010 _DATA	
+resultLbl  . . . . . . . . . . .	Byte	 0000004B _DATA	
+string . . . . . . . . . . . . .	Byte	 00000023 _DATA	
+wtoaproc . . . . . . . . . . . .	L Near	 00000000 FLAT	External
+xxx  . . . . . . . . . . . . . .	Byte	 000000C1 _DATA	
+
+	   0 Warnings
+	   0 Errors

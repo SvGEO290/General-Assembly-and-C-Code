@@ -1,0 +1,277 @@
+Microsoft (R) Macro Assembler Version 14.29.30148.0	    03/10/23 23:18:24
+example.asm						     Page 1 - 1
+
+
+				; Assignment-06
+				; Author:  Samuel George
+				; Date:    3/3/2023
+
+				.586
+				.MODEL FLAT
+
+				INCLUDE io.h            ; header file for input/output
+			      C ; IO.H -- header file for I/O macros (listing suppressed)
+			      C .NOLIST      ; turn off listing
+			      C .LIST        ; begin listing
+			      C 
+
+				.STACK 4096
+
+ 00000000			.DATA
+
+				;variables
+
+ 00000000 00000000		numberX DWORD   ?
+ 00000004 00000000		numberY DWORD   ?
+
+				;prompts
+
+
+
+				;if statements if answer is less than or equal to 0
+
+ 00000008 49 6E 76 61 6C	invalidLbl  BYTE    "Invalid Input", 0
+	   69 64 20 49 6E
+	   70 75 74 00
+ 00000016 59 6F 75 20 63	invalidInfo BYTE    "You can not enter a value less than 0", 0
+	   61 6E 20 6E 6F
+	   74 20 65 6E 74
+	   65 72 20 61 20
+	   76 61 6C 75 65
+	   20 6C 65 73 73
+	   20 74 68 61 6E
+	   20 30 00
+
+
+
+				;basic input for variables
+
+ 0000003C 45 6E 74 65 72	promptX BYTE    "Enter a value for x", 0
+	   20 61 20 76 61
+	   6C 75 65 20 66
+	   6F 72 20 78 00
+ 00000050 45 6E 74 65 72	promptY BYTE    "Enter a value for y", 0
+	   20 61 20 76 61
+	   6C 75 65 20 66
+	   6F 72 20 79 00
+ 00000064  00000028 [		string  BYTE    40 DUP (?)
+	    00
+	   ]
+
+
+
+				;output result for converting it into ASCII
+
+ 0000008C  0000000B [		convertAns  BYTE    11 DUP (?), 0
+	    00
+	   ] 00
+
+
+
+				;output for answer
+
+ 00000098 54 68 65 20 61	answerVal     BYTE  "The answer of the expression is ", 0
+	   6E 73 77 65 72
+	   20 6F 66 20 74
+	   68 65 20 65 78
+	   70 72 65 73 73
+	   69 6F 6E 20 69
+	   73 20 00
+ 000000B9  00000003 [		hMeanOut BYTE 3 DUP ('?'), '.', ?, 0
+	    3F
+	   ] 2E 00 00
+
+
+ 00000000			.CODE
+ 00000000			_MainProc PROC
+
+
+
+				        ;input prompt for x and converting it into an integer
+
+				        input   promptX, string, 40     ; read ASCII characters
+				        atod    string                  ; convert to integer
+ 0000002D  A3 00000000 R	        mov     numberX, eax            ; storing numberX into eax
+
+
+
+ 00000032  83 F8 00		        cmp     eax, 0                  ; comparing value of eax to 0   
+ 00000035  7F 1E		        jnle      validN    
+				        
+
+
+				        output  invalidLbl, invalidInfo ; output if eax is 0
+
+ 00000050  E9 000000E4		        jmp     exit
+
+
+ 00000055			validN:
+
+				        ;input prompt for y and converting it into an integer
+
+				        input   promptY, string, 40      ; repeat for second number
+				        atod    string
+ 00000082  A3 00000004 R	        mov     numberY, eax
+
+ 00000087  83 F8 00		        cmp     eax, 0                  ; comparing value of eax to 0   
+ 0000008A  7F 1E		        jnle      validN2    
+				        
+
+
+				        output  invalidLbl, invalidInfo ; output if eax is 0
+
+ 000000A5  E9 0000008F		        jmp     exit
+
+ 000000AA			validN2:                                ; code to continue if y is not 0
+
+				        ;numerator
+
+ 000000AA  A1 00000000 R	        mov     eax, numberX            ; first value into eax, x
+
+
+
+ 000000AF  0F AF 05		        imul    eax, NumberY            ; xy
+	   00000004 R
+ 000000B6  6B C0 14		        imul    eax, 20                  ; 20xy
+
+
+
+
+				        ;denominator
+
+ 000000B9  8B 1D 00000000 R	        mov     ebx, NumberX
+ 000000BF  03 1D 00000004 R	        add     ebx, NumberY
+
+
+				        ;division
+ 000000C5  99			        cdq
+ 000000C6  F7 FB		        idiv    ebx                                  ; dividing eax by ebx, numerator/denominator
+				        
+
+
+				        dtoa        convertAns, eax                     ; converting eax into a string into the string 'convertAns'
+
+
+				                                                    
+				        ; 'convertAns' will be the string we copy byte by byte into hMeanOut
+
+ 000000E0  8D 35 0000008C R	        lea     esi, convertAns                     ; loading contents of convertAns into esi
+ 000000E6  83 C6 09		        add     esi, 9                              ; 
+
+ 000000E9  8D 3D 000000B9 R	        lea     edi, hMeanOut                       ; loading contents of hMeanOut into edi
+ 000000EF  83 C7 02		        add     edi, 2                              ; edi only has 2 index values
+				        
+ 000000F2  8A 06		        mov     al, [esi]                           ; al 3rd Index
+ 000000F4  88 07		        mov     [edi], al                           ;
+
+ 000000F6  4E			        dec     esi                                 ;
+ 000000F7  4F			        dec     edi                                 ;
+
+ 000000F8  8A 06		        mov     al, [esi]                           ; al 2nd Index
+ 000000FA  88 07		        mov     [edi], al
+
+ 000000FC  4E			        dec     esi                                 ;
+ 000000FD  4F			        dec     edi
+
+ 000000FE  8A 06		        mov     al, [esi]                           ; al  1st Index
+ 00000100  88 07		        mov     [edi], al
+
+ 00000102  4E			        dec     esi                                 ;
+ 00000103  4F			        dec     edi
+
+ 00000104  8A 06		        mov     al, [esi]                           ; al  primary index
+ 00000106  88 07		        mov     [edi], al        
+
+ 00000108  8D 35 0000008C R	        lea     esi, convertAns                     ; loading contents of convertAns into esi
+ 0000010E  83 C6 0A		        add     esi, 10                              ; 
+
+ 00000111  8D 3D 000000B9 R	        lea     edi, hMeanOut                       ; loading contents of hMeanOut into edi
+ 00000117  83 C7 04		        add     edi, 4                              ; edi only has 2 index values
+
+ 0000011A  8A 06		        mov     al, [esi]                           ; al 3rd Index
+ 0000011C  88 07		        mov     [edi], al                           ;
+
+
+				        output      answerVal, hMeanOut      ;display answer
+
+				        
+ 00000137  EB 00		        jmp     exit            
+
+
+ 00000139			exit:    
+
+ 00000139  B8 00000000		        mov     eax, 0  ; exit with return code 0
+ 0000013E  C3			        ret
+ 0000013F			_MainProc ENDP
+				END                             ; end of source code
+
+Microsoft (R) Macro Assembler Version 14.29.30148.0	    03/10/23 23:18:24
+example.asm						     Symbols 2 - 1
+
+
+
+
+Macros:
+
+                N a m e                 Type
+
+atod . . . . . . . . . . . . . .	Proc
+atow . . . . . . . . . . . . . .	Proc
+dtoa . . . . . . . . . . . . . .	Proc
+input  . . . . . . . . . . . . .	Proc
+output . . . . . . . . . . . . .	Proc
+wtoa . . . . . . . . . . . . . .	Proc
+
+
+Segments and Groups:
+
+                N a m e                 Size     Length   Align   Combine Class
+
+FLAT . . . . . . . . . . . . . .	GROUP
+STACK  . . . . . . . . . . . . .	32 Bit	 00001000 Para	  Stack	  'STACK'	 
+_DATA  . . . . . . . . . . . . .	32 Bit	 000000BF Para	  Public  'DATA'	
+_TEXT  . . . . . . . . . . . . .	32 Bit	 0000013F Para	  Public  'CODE'	
+
+
+Procedures, parameters, and locals:
+
+                N a m e                 Type     Value    Attr
+
+_MainProc  . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 0000013F Public
+  validN . . . . . . . . . . . .	L Near	 00000055 _TEXT	
+  validN2  . . . . . . . . . . .	L Near	 000000AA _TEXT	
+  exit . . . . . . . . . . . . .	L Near	 00000139 _TEXT	
+
+
+Symbols:
+
+                N a m e                 Type     Value    Attr
+
+@CodeSize  . . . . . . . . . . .	Number	 00000000h   
+@DataSize  . . . . . . . . . . .	Number	 00000000h   
+@Interface . . . . . . . . . . .	Number	 00000000h   
+@Model . . . . . . . . . . . . .	Number	 00000007h   
+@code  . . . . . . . . . . . . .	Text   	 _TEXT
+@data  . . . . . . . . . . . . .	Text   	 FLAT
+@fardata?  . . . . . . . . . . .	Text   	 FLAT
+@fardata . . . . . . . . . . . .	Text   	 FLAT
+@stack . . . . . . . . . . . . .	Text   	 FLAT
+_getInput  . . . . . . . . . . .	L Near	 00000000 FLAT	External
+_showOutput  . . . . . . . . . .	L Near	 00000000 FLAT	External
+answerVal  . . . . . . . . . . .	Byte	 00000098 _DATA	
+atodproc . . . . . . . . . . . .	L Near	 00000000 FLAT	External
+atowproc . . . . . . . . . . . .	L Near	 00000000 FLAT	External
+convertAns . . . . . . . . . . .	Byte	 0000008C _DATA	
+dtoaproc . . . . . . . . . . . .	L Near	 00000000 FLAT	External
+hMeanOut . . . . . . . . . . . .	Byte	 000000B9 _DATA	
+invalidInfo  . . . . . . . . . .	Byte	 00000016 _DATA	
+invalidLbl . . . . . . . . . . .	Byte	 00000008 _DATA	
+numberX  . . . . . . . . . . . .	DWord	 00000000 _DATA	
+numberY  . . . . . . . . . . . .	DWord	 00000004 _DATA	
+promptX  . . . . . . . . . . . .	Byte	 0000003C _DATA	
+promptY  . . . . . . . . . . . .	Byte	 00000050 _DATA	
+string . . . . . . . . . . . . .	Byte	 00000064 _DATA	
+wtoaproc . . . . . . . . . . . .	L Near	 00000000 FLAT	External
+
+	   0 Warnings
+	   0 Errors
